@@ -79,7 +79,10 @@
                             <table id="dataTable1" class="table table-bordered table-hover" role="grid">
                                 <thead>
                                 <tr class="bg-primary">
-                                    <th rowspan="2"><input type="checkbox" id="checkAll"></th>
+                                    <th rowspan="2">
+                                        <input type="checkbox" id="checkAll" onchange="calculateGrandTotal()">
+                                    </th>
+                                    
                                     <th rowspan="2">No.</th>
                                     <th rowspan="2">Booking Date</th>
                                     <th rowspan="2">Travel Date</th>
@@ -106,12 +109,13 @@
                                 <tbody>
                                 @if(!empty($invoice->data))
                                     @foreach($invoice->data as $k => $row)
-                                        @php $grandTotal += $row->grandTotal @endphp
+                                        {{-- @php $grandTotal += $row->grandTotal @endphp --}}
                                         <tr>
                                             <td>
                                                 <input type="checkbox" id="id{{ $row->voucherNo }}" name="items[]"
-                                                       value="{{ $row->no - 1 }}"
-                                                       onchange="getGrandTotal({{ "'".$row->voucherNo."',".$row->grandTotal }})">
+                                                value="{{ $row->no }}"
+                                                onchange="getGrandTotal('{{ $row->voucherNo }}', {{ $row->grandTotal }})">
+                                         
                                                 <input type="hidden" name="vouchers[]"
                                                        value="{{ $row->voucherNo }}">
                                                 <input type="hidden" name="agents[]"
@@ -209,6 +213,7 @@
 @endsection
 
 @section('script')
+
     <!-- bootstrap datepicker -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="{{ asset('bower_components/admin-lte/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
@@ -242,6 +247,7 @@
         });
 
         function getInvoice() {
+            
             var invNo = $('#invoice_no').val();
             var checkbox = $("input:checkbox").is(":checked");
             $('#invNo').val(invNo);
@@ -264,19 +270,42 @@
             $('#end').val(endDate);
             $('#datatype').val(selectType);
         }
+           
+
+        function calculateGrandTotal() {
+            var checkboxes = $("input[name='items[]']");
+            var grandTotal = 0;
+
+            checkboxes.each(function() {
+                var checkbox = $(this);
+                var voucherNo = checkbox.attr('id').substring(2);
+                var amount = parseInt(checkbox.closest('tr').find('input[name="amounts[]"]').val());
+
+                if (!checkbox.prop('checked')) {
+                grandTotal += amount;
+                }
+            });
+
+            $('#showGrandTotal').text($.number(grandTotal));
+        }
+
+
+
 
         function getGrandTotal(no, amount) {
-            var grandTotal = $('#grandTotal').val();
+            var grandTotal = parseInt($('#showGrandTotal').text().replace(/,/g, '')); // Remove commas from grand total
             var sumTotal = 0;
+            
             if ($('#id' + no).prop('checked')) {
-                sumTotal = parseInt(grandTotal) + parseInt(amount);
-                $('#showGrandTotal').html($.number(sumTotal));
-            } else {
-                sumTotal = parseInt(grandTotal) - parseInt(amount);
-                $('#showGrandTotal').html($.number(sumTotal));
+                sumTotal = grandTotal + parseInt(amount);
+                $('#showGrandTotal').text($.number(sumTotal)); // Format the sumTotal with commas
+            } else  {
+                sumTotal = grandTotal - parseInt(amount);
+                $('#showGrandTotal').text($.number(sumTotal)); // Format the sumTotal with commas
             }
         }
 
+        
         function copy() {
             var a2 = document.getElementById("dateType")
             var b2 = document.getElementById("dateType2")

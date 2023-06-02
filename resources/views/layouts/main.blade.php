@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{{ $page_title or "AdminLTE Dashboard" }}</title>
+    <title>{{ "AdminLTE Dashboard" }}</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.2 -->
     <link href="{{ asset("bower_components/admin-lte/bootstrap/css/bootstrap.min.css") }}" rel="stylesheet"
@@ -37,8 +37,8 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <h1>
-                {{ $page_title or "Page Title" }}
-                <small>{{ $page_description or null }}</small>
+                {{ "Page Title" }}
+                <small>{{ "test" }}</small>
             </h1>
             <!-- You can dynamically generate breadcrumbs here -->
             <ol class="breadcrumb">
@@ -46,7 +46,7 @@
                 <li class="active">Here</li>
             </ol>
         </section>
-
+        
         <!-- Main content -->
         <section class="content">
             <!-- Your Page Content Here -->

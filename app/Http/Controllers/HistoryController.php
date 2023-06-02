@@ -26,7 +26,7 @@ class HistoryController extends Controller
     {
         $data['page_title'] = 'History';
         $data['invNo'] = $request->input('invNo');
-
+    
         $invoice = $this->client->get(env('APP_URL') . '/api/history/list?invNo=' . $data['invNo'])->getBody();
         $data['invoice'] = json_decode($invoice);
         return view('invoice.history', $data);

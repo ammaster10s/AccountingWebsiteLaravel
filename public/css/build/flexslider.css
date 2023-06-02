@@ -1,0 +1,226 @@
+html[xmlns] .slides {
+    display: block;
+}
+
+* html .slides {
+    height: 1%;
+}
+
+#slider_wrapper {
+    position: relative;
+}
+
+#slider {
+    margin: 0;
+    position: relative;
+}
+
+#flexslider {
+    position: relative;
+    min-height: 684px;
+}
+
+#flexslider .slides > li {
+    display: none;
+    position: relative;
+}
+
+.slides:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.slides {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.slides img {
+    width: 100%;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+}
+
+#flexslider .flex-control-nav {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 65px;
+    z-index: 5;
+    overflow: hidden;
+    list-style: none;
+    text-align: center;
+    line-height: 1;
+}
+
+#flexslider .flex-control-nav li {
+    display: inline-block;
+    float: none;
+    width: 11px;
+    height: 10px;
+    margin: 0 8px;
+}
+
+#flexslider .flex-control-nav li:first-child {
+}
+
+#flexslider .flex-control-nav li a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: none;
+    text-indent: -9999%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: url(/public/images/pagination.png) left top no-repeat;
+}
+
+#flexslider .flex-control-nav li a:hover, #flexslider .flex-control-nav li a.flex-active {
+    background-position: right;
+}
+
+#flexslider .flex-control-nav li .flex-active {
+    cursor: default;
+    pointer-events: none;
+}
+
+#flexslider .flex-direction-nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#flexslider .flex-direction-nav li {
+}
+
+#flexslider .flex-direction-nav li a {
+    display: block;
+    width: 36px;
+    height: 35px;
+    position: absolute;
+    left: 1%;
+    margin-top: -18px;
+    top: 50%;
+}
+
+#flexslider .flex-direction-nav li a.flex-prev {
+    background: url(/public/images/prev.png) left top no-repeat;
+}
+
+#flexslider .flex-direction-nav li a.flex-prev:hover {
+    background-position: bottom;
+}
+
+#flexslider .flex-direction-nav li a.flex-next {
+    background: url(/public/images/next.png) left top no-repeat;
+    left: auto;
+    right: 1%;
+}
+
+#flexslider .flex-direction-nav li a.flex-next:hover {
+    background-position: bottom;
+}
+
+.flex-caption {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50%;
+    margin-top: -62px;
+    text-align: left;
+}
+
+.flex-caption > div {
+}
+
+.flex-caption .txt1 {
+    font-family: 'Lobster';
+    font-weight: 400;
+    font-size: 62px;
+    line-height: 1;
+    color: #57343a;
+    padding-bottom: 0px;
+}
+
+.nav2 .flex-caption .txt1, .nav2 .flex-caption .txt2, .nav3 .flex-caption .txt1, .nav3 .flex-caption .txt2 {
+    color: #fff;
+}
+
+.flex-caption .txt2 {
+    font-family: 'Roboto Slab';
+    font-weight: 300;
+    font-size: 62px;
+    line-height: 1;
+    color: #a76581;
+}
+
+@media (max-width: 1199px) {
+    #flexslider {
+        min-height: 564px;
+    }
+
+}
+
+@media (max-width: 991px) {
+    #flexslider {
+        min-height: 435px;
+    }
+
+    .flex-caption {
+        margin-top: -50px;
+    }
+
+    .flex-caption .txt1 {
+        font-size: 50px;
+    }
+
+    .flex-caption .txt2 {
+        font-size: 50px;
+    }
+
+}
+
+@media (max-width: 767px) {
+    #flexslider {
+        min-height: 185px;
+    }
+
+    .flex-caption {
+        margin-top: -40px;
+        text-align: center;
+    }
+
+    .flex-caption .txt1 {
+        font-size: 40px;
+    }
+
+    .flex-caption .txt2 {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /*.flex-caption{display: none;}*/
+    .flex-caption {
+        margin-top: -25px;
+    }
+
+    .flex-caption .txt1 {
+        font-size: 25px;
+    }
+
+    .flex-caption .txt2 {
+        font-size: 25px;
+    }
+}

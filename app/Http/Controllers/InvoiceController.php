@@ -197,6 +197,7 @@ class InvoiceController extends Controller
             $dataType = $row->datatype;
             $date = substr($row->inv_date, 0, 10);
         }
+        
         $data['agentId'] = $agentId;
         $data['amount'] = number_format($amount, 0);
         $data['amountText'] = ucfirst($this->currency->bahtEng($amount));
@@ -217,6 +218,7 @@ class InvoiceController extends Controller
             $data['date'] = $this->getFunction->DateFormat('2019-03-21', 'm');
 
         $pdf = PDF::loadView('pdf.invoice', $data);
+        
         return @$pdf->stream($invNo . '.pdf');
     }
 
@@ -240,47 +242,20 @@ class InvoiceController extends Controller
     {
         $today = date('Y-m-d H:i:s');
         $voucher = [];
+    
         foreach ($items as $item) {
-          
-           array_push($voucher, $vouchers[$item]);
-            // $agent[] = ['agents' => $agents[$item]];
-            // $amont[] = ['amounts' => $amounts[$item]];
-           
+            array_push($voucher, $vouchers[$item]);
         }
-
+    
         $query = DB::table('invoice_detail')->whereIn('voucherNo', $voucher)->get();
-
         $numVouch = $query->count();
-
+    
         $invoice = DB::table('invoice_detail')->where('invNo', $invNo)->get();
-
         $numInv = $invoice->count();
-        
-        // dd($numVouch);
-        // dd($numInv);
-        if ( $numInv == 0) {       //Make new one if not already created
+    
+        if ($numVouch == 0 && $numInv == 0) { // Make new one if not already created
             foreach ($items as $item) {
-                DB::table('invoice_detail')->Insert([
-                    'id' => null,
-                    'invRun' => 0,
-                    'invNo' => $invNo,
-                    'voucherNo' => $vouchers[$item],
-                    'agentId' => $agents[$item],
-                    'amount' => $amounts[$item],
-                    'status' => 'Y',
-                    'datatype' => $type,
-                    'inv_date' => is_array($bookingDate) ? $bookingDate[$item] : $bookingDate,
-                    'creation_date' => $today,
-                    'last_update' => $today
-                ]);
-                // dd($item);
-            }
-        } elseif ($numVouch == 0 && $numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv) {
-
-            DB::table('invoice_detail')->where('invNo',  $invNo)->delete();
-
-            foreach ($items as $item) {
-                DB::table('invoice_detail')->Insert([
+                DB::table('invoice_detail')->insert([
                     'id' => null,
                     'invRun' => 0,
                     'invNo' => $invNo,
@@ -294,17 +269,51 @@ class InvoiceController extends Controller
                     'last_update' => $today
                 ]);
             }
-        } elseif (($numVouch > 0) && $query->where('status', '=', 'N')->count() == $numVouch) {
-
+        }
+        // elseif ($numVouch > 0 && $numInv == 0) { // Make new one if not already created
+        //     foreach ($items as $item) {
+        //         DB::table('invoice_detail')->insert([
+        //             'id' => null,
+        //             'invRun' => 0,
+        //             'invNo' => $invNo,
+        //             'voucherNo' => $vouchers[$item],
+        //             'agentId' => $agents[$item],
+        //             'amount' => $amounts[$item],
+        //             'status' => 'Y',
+        //             'datatype' => $type,
+        //             'inv_date' => is_array($bookingDate) ? $bookingDate[$item] : $bookingDate,
+        //             'creation_date' => $today,
+        //             'last_update' => $today
+        //         ]);
+        //     }
+        // } 
+        elseif ($numVouch == 0 && $numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv) {
+            DB::table('invoice_detail')->where('invNo', $invNo)->delete();
+    
+            foreach ($items as $item) {
+                DB::table('invoice_detail')->insert([
+                    'id' => null,
+                    'invRun' => 0,
+                    'invNo' => $invNo,
+                    'voucherNo' => $vouchers[$item],
+                    'agentId' => $agents[$item],
+                    'amount' => $amounts[$item],
+                    'status' => 'Y',
+                    'datatype' => $type,
+                    'inv_date' => is_array($bookingDate) ? $bookingDate[$item] : $bookingDate,
+                    'creation_date' => $today,
+                    'last_update' => $today
+                ]);
+            }
+        } elseif ($numVouch > 0 && $query->where('status', '=', 'N')->count() == $numVouch) {
             $invoice = DB::table('invoice_detail')
                 ->whereIn('invNo', $query->pluck('invNo'))
                 ->get();
             $numInv = $invoice->count();
-
-//            dd($numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv );
+    
             if ($numInv == 0) {
                 foreach ($items as $item) {
-                    DB::table('invoice_detail')->Insert([
+                    DB::table('invoice_detail')->insert([
                         'id' => null,
                         'invRun' => 0,
                         'invNo' => $invNo,
@@ -319,25 +328,45 @@ class InvoiceController extends Controller
                     ]);
                 }
             } elseif ($numInv > 0 && $query->contains('status', 'N')) {
+                $updatedValues = [];
+    
                 foreach ($items as $item) {
-                    $values = array(
-                        'id' => null,
-                        'invRun' => 0,
-                        'invNo' => $invNo,
-                        'voucherNo' => $vouchers[$item],
-                        'agentId' => $agents[$item],
-                        'amount' => $amounts[$item],
-                        'status' => 'Y',
-                        'datatype' => $type,
-                        'inv_date' => is_array($bookingDate) ? $bookingDate[$item] : $bookingDate,
-                        'creation_date' => $today,
-                        'last_update' => $today
-                    );
+                    if ($invoice->where('voucherNo', $vouchers[$item])->where('status', 'N')->count() > 0) {
+                        $updatedValues[] = [
+                            'voucherNo' => $vouchers[$item],
+                            'status' => 'Y',
+                            'last_update' => $today
+                        ];
+                    } else {
+                        DB::table('invoice_detail')->insert([
+                            'id' => null,
+                            'invRun' => 0,
+                            'invNo' => $invNo,
+                            'voucherNo' => $vouchers[$item],
+                            'agentId' => $agents[$item],
+                            'amount' => $amounts[$item],
+                            'status' => 'Y',
+                            'datatype' => $type,
+                            'inv_date' => is_array($bookingDate) ? $bookingDate[$item] : $bookingDate,
+                            'creation_date' => $today,
+                            'last_update' => $today
+                        ]);
+                    }
                 }
-                // dd($values);
-                $this->invoiceDetail::whereIn('primary_key', 'value')->update($values);
+    
+                if (!empty($updatedValues)) {
+                    foreach ($updatedValues as $value) {
+                        DB::table('invoice_detail')
+                            ->where('invNo', $invNo)
+                            ->where('voucherNo', $value['voucherNo'])
+                            ->update([
+                                'status' => $value['status'],
+                                'last_update' => $value['last_update']
+                            ]);
+                    }
+                }
             }
-
         }
     }
+    
 }

@@ -34,8 +34,8 @@ class HistoryController extends Controller
 
         if ($invNo) {
             $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
-                ->orderBy('invNo', 'desc')
-                ->groupBy('invNo')
+                // ->orderBy('invNo', 'desc')
+                // ->groupBy('invNo')
                 ->get();
         } else {
             $invoice = $invoice->get();

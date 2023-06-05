@@ -275,7 +275,7 @@
         }
            
 
-        function calculateGrandTotal() {
+        function calculateGrandTotal() {            //Checkall
             var checkboxes = $("input[name='items[]']");
             var grandTotal = 0;
 
@@ -295,7 +295,7 @@
 
 
 
-        function getGrandTotal(no, amount) {
+        function getGrandTotal(no, amount) {        //Check each
             var grandTotal = parseInt($('#showGrandTotal').text().replace(/,/g, '')); 
             var sumTotal = 0;
             

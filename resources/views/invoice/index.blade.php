@@ -113,7 +113,8 @@
                                         <tr>
                                             <td>
                                                 <input type="checkbox" id="id{{ $row->voucherNo }}" name="items[]"
-                                                value="{{ $row->no }}"
+                                                value="{{ $row->no - 1 }}"
+                                              
                                                 onchange="getGrandTotal('{{ $row->voucherNo }}', {{ $row->grandTotal }})">
                                          
                                                 <input type="hidden" name="vouchers[]"
@@ -254,10 +255,12 @@
 
             if (checkbox) {
                 $('#getInvoice').submit();
+
                 alert('Save successfully!')
             } else {
                 alert('Please check record!');
             }
+           
         }
 
         function createInvoice() {
@@ -293,19 +296,19 @@
 
 
         function getGrandTotal(no, amount) {
-            var grandTotal = parseInt($('#showGrandTotal').text().replace(/,/g, '')); // Remove commas from grand total
+            var grandTotal = parseInt($('#showGrandTotal').text().replace(/,/g, '')); 
             var sumTotal = 0;
             
             if ($('#id' + no).prop('checked')) {
                 sumTotal = grandTotal + parseInt(amount);
-                $('#showGrandTotal').text($.number(sumTotal)); // Format the sumTotal with commas
+                $('#showGrandTotal').text($.number(sumTotal)); 
             } else  {
                 sumTotal = grandTotal - parseInt(amount);
-                $('#showGrandTotal').text($.number(sumTotal)); // Format the sumTotal with commas
+                $('#showGrandTotal').text($.number(sumTotal)); 
             }
         }
 
-        
+
         function copy() {
             var a2 = document.getElementById("dateType")
             var b2 = document.getElementById("dateType2")

@@ -26,21 +26,45 @@ class HistoryController extends Controller
     {
         $data['page_title'] = 'History';
         $data['invNo'] = $request->input('invNo');
-    
-        $invoice = $this->client->get(env('APP_URL') . '/api/history/list?invNo=' . $data['invNo'])->getBody();
-        $data['invoice'] = json_decode($invoice);
+
+        $invNo = $request->input('invNo');
+
+        $this->setData = $this->statusCode->getStatusCode(200000);
+        $invoice = $this->invoiceDetail;
+
+        if ($invNo) {
+            $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
+                ->orderBy('invNo', 'desc')
+                ->groupBy('invNo')
+                ->get();
+        } else {
+            $invoice = $invoice->get();
+        }
+
+        //$invoice = $this->client->get(env('APP_URL') . '/api/history/list?invNo=' . $data['invNo'])->getBody();
+        $data['invoice'] = $invoice;
         return view('invoice.history', $data);
+    }
+
+    private function getA($invNo){
+        $invoice = $this->invoiceDetail;
+
+        if ($invNo) {
+            $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
+                ->orderBy('invNo', 'desc')
+                ->groupBy('invNo')
+                ->get();
+        } else {
+            $invoice = $invoice->get();
+        }
+
+        return $invoice;
     }
 
     public function getHistory(Request $request)
     {
         $invNo = $request->input('invNo');
-        $this->setData = $this->statusCode->getStatusCode(200000);
-        $invoice = $this->invoiceDetail;
-        if ($invNo) {
-            $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%');
-        }
-        $this->setData['data'] = $invoice->orderBy('invNo', 'desc')->groupBy('invNo')->get();
+        $this->setData['data'] = $this->getA(($invNo));
         return response()->json($this->setData);
     }
 

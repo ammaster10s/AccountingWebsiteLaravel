@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reservation;
-
 use App\Helpers\Currency;
 use App\Helpers\GenVoucher;
 use App\Helpers\StatusCode;
 use App\Models\Agent;
 use App\Models\InvoiceDetail;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
+use GuzzleHttp;
 use Illuminate\Support\Facades\Log;
 use PDF;
 use Carbon\Carbon;
@@ -39,10 +38,10 @@ class InvoiceController extends Controller
         $this->getFunction = new GenVoucher();
         $this->invoiceDetail = new InvoiceDetail();
         $this->agent = new Agent();
-        $this->client = new Client();
+        $this->client = new GuzzleHttp\Client();
         $this->currency = new Currency();
+        
     }
-
 
     public function index(Request $request)
     {
@@ -50,7 +49,7 @@ class InvoiceController extends Controller
         $data['agentId'] = $request->input('agentId');
         $data['dateType'] = $request->input('dateType');
         $data['grandTotal'] = 0;
-
+        
         $type = $data['agentId'] != 'b2c' ? 1 : 2;
 
         $startDate = date('m/d/Y', strtotime('today'));
@@ -75,23 +74,15 @@ class InvoiceController extends Controller
         $invoice = $this->client->get($invoiceURL)->getBody();
 
         Log::info('GET|' . $invoiceURL);
-
+        // dd(json_decode($invoice));
         return json_decode($invoice);
     }
 
     private function getAgentData()
     {
-        try {
-            //code...
-
-            $agentURL = env('APP_URL') . '/api/agent/list';
-            //dd($agentURL);
-            $agent = $this->client->get($agentURL)->getBody();
-
-            return json_decode($agent);
-        } catch (\Throwable $th) {
-            // dd($th);
-        }
+        $agentURL = env('APP_URL') . '/api/agent/list';
+        $agent = $this->client->get($agentURL)->getBody();
+        return json_decode($agent);
     }
 
     public function getInvoice(Request $request)
@@ -103,7 +94,7 @@ class InvoiceController extends Controller
         $typeId = $request->input('type') ?? '';
         $startDate = $request->input('startDate') ?? date('Y-m-d');
         $endDate = $request->input('endDate') ?? date('Y-m-d', strtotime('today'));
-        //        $limit = $request->input('limit') ?? 300;
+//        $limit = $request->input('limit') ?? 300;
         $offset = $request->input('offset') ?? 0;
 
         $order = $this->reservation->getOrder($agentId, $typeId, $voucherNo, $dateType, $startDate, $endDate, $offset);
@@ -165,7 +156,7 @@ class InvoiceController extends Controller
         $vouchers = $request->input('vouchers');
         $agents = $request->input('agents');
         $amounts = $request->input('amounts');
-
+       
         $bookingDate = $request->input('bookingDate');
         $travelDate = $request->input('travelDate');
         $dataType = $request->input('datatype');
@@ -250,10 +241,11 @@ class InvoiceController extends Controller
         $today = date('Y-m-d H:i:s');
         $voucher = [];
         foreach ($items as $item) {
-
-            array_push($voucher, $vouchers[$item]);
-            $agent[] = ['agents' => $agents[$item]];
-            $amont[] = ['amounts' => $amounts[$item]];
+          
+           array_push($voucher, $vouchers[$item]);
+            // $agent[] = ['agents' => $agents[$item]];
+            // $amont[] = ['amounts' => $amounts[$item]];
+           
         }
 
         $query = DB::table('invoice_detail')->whereIn('voucherNo', $voucher)->get();
@@ -263,8 +255,10 @@ class InvoiceController extends Controller
         $invoice = DB::table('invoice_detail')->where('invNo', $invNo)->get();
 
         $numInv = $invoice->count();
-
-        if ($numVouch == 0 && $numInv == 0) {
+        
+        // dd($numVouch);
+        // dd($numInv);
+        if ( $numInv == 0) {       //Make new one if not already created
             foreach ($items as $item) {
                 DB::table('invoice_detail')->Insert([
                     'id' => null,
@@ -279,10 +273,11 @@ class InvoiceController extends Controller
                     'creation_date' => $today,
                     'last_update' => $today
                 ]);
+                // dd($item);
             }
         } elseif ($numVouch == 0 && $numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv) {
 
-            DB::table('invoice_detail')->where('invNo', $invNo)->delete();
+            DB::table('invoice_detail')->where('invNo',  $invNo)->delete();
 
             foreach ($items as $item) {
                 DB::table('invoice_detail')->Insert([
@@ -306,7 +301,7 @@ class InvoiceController extends Controller
                 ->get();
             $numInv = $invoice->count();
 
-            //            dd($numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv );
+//            dd($numInv > 0 && $invoice->where('status', '=', 'N')->count() == $numInv );
             if ($numInv == 0) {
                 foreach ($items as $item) {
                     DB::table('invoice_detail')->Insert([
@@ -339,7 +334,7 @@ class InvoiceController extends Controller
                         'last_update' => $today
                     );
                 }
-                dd($values);
+                // dd($values);
                 $this->invoiceDetail::whereIn('primary_key', 'value')->update($values);
             }
 

@@ -47,9 +47,9 @@
                             </thead>
 
                             <tbody>
-                            @if(!empty($invoice->data))
+                            @if(!empty($invoice))
                                 @php $no = 1; @endphp
-                                @foreach($invoice->data as $k => $row)
+                                @foreach($invoice as $k => $row)
                                     <tr>
                                         <td>{{ $no }}</td>
                                         <td>

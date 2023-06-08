@@ -34,13 +34,22 @@ class HistoryController extends Controller
 
         if ($invNo) {
             $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
-                // ->orderBy('invNo', 'desc')
-                // ->groupBy('invNo')
-                ->get();
-        } else {
-            $invoice = $invoice->get();
-        }
+                ->groupBy('invNo', 'status')
+                ->select('invNo', 'status')
+                ->get(['invNo', 'status']);
 
+                 
+        } else {
+        
+                $invoice = $invoice     /*->where('invNo', 'like', '%' . $invNo . '%')*/
+                    ->groupBy('invNo', 'status')
+                    ->select('invNo', 'status')
+                    ->get(['invNo', 'status']);
+            
+        }
+    
+
+        
         //$invoice = $this->client->get(env('APP_URL') . '/api/history/list?invNo=' . $data['invNo'])->getBody();
         $data['invoice'] = $invoice;
         return view('invoice.history', $data);
@@ -53,9 +62,14 @@ class HistoryController extends Controller
             $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
                 ->orderBy('invNo', 'desc')
                 ->groupBy('invNo')
+
                 ->get();
         } else {
-            $invoice = $invoice->get();
+            $invoice = $invoice->where('invNo', 'like', '%' . $invNo . '%')
+            ->orderBy('invNo', 'desc')
+            ->groupBy('invNo')
+
+            ->get();
         }
 
         return $invoice;

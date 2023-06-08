@@ -115,7 +115,7 @@
                                                 <input type="checkbox" id="id{{ $row->voucherNo }}" name="items[]"
                                                 value="{{ $row->no - 1 }}"
                                               
-                                                onchange="getGrandTotal('{{ $row->voucherNo }}', {{ $row->grandTotal }})">
+                                                onchange="getGrandTotal('{{ $row->voucherNo }}', {{ $row->grandTotal }},'{{ $row->bookingDate }}')">
                                          
                                                 <input type="hidden" name="vouchers[]"
                                                        value="{{ $row->voucherNo }}">
@@ -274,7 +274,7 @@
             $('#datatype').val(selectType);
         }
            
-
+        var selectedTime = "";
         function calculateGrandTotal() {            //Checkall
             var checkboxes = $("input[name='items[]']");
             var grandTotal = 0;
@@ -286,6 +286,11 @@
 
                 if (!checkbox.prop('checked')) {
                 grandTotal += amount;
+                // selectedTime = date;                        //Select the latest time
+                // var currentCustomDate = $('#customDate').val();
+                // if (!currentCustomDate || selectedTime > currentCustomDate) {
+                // $('#customDate').val(selectedTime);
+                // }
                 }
             });
 
@@ -294,13 +299,22 @@
 
 
 
-
-        function getGrandTotal(no, amount) {        //Check each
+        var selectedTime = "";
+        function getGrandTotal(no, amount,date) {        //Check each
             var grandTotal = parseInt($('#showGrandTotal').text().replace(/,/g, '')); 
             var sumTotal = 0;
             
             if ($('#id' + no).prop('checked')) {
                 sumTotal = grandTotal + parseInt(amount);
+                
+                selectedTime = date;                        //Select the latest time
+                var currentCustomDate = $('#customDate').val();
+                if (!currentCustomDate || selectedTime > currentCustomDate) {
+                $('#customDate').val(selectedTime);
+                }
+
+                console.log(date);
+
                 $('#showGrandTotal').text($.number(sumTotal)); 
             } else  {
                 sumTotal = grandTotal - parseInt(amount);
@@ -362,5 +376,7 @@
                 })
             }
         }
+
+       
     </script>
 @endsection

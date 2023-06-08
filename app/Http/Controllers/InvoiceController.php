@@ -136,8 +136,7 @@ class InvoiceController extends Controller
     public function getVoucherNo(Request $request)
     {
         $invNo = $request->input('invNo');
-
-        $invoices = $this->invoiceDetail->where('invNo', $invNo)->orderBy('voucherNo', 'asc')->get();
+        $invoices = $this->invoiceDetail->where('invNo', $invNo)->orderBy('voucherNo', 'asc')->get('voucherNo');
         $this->setData = $this->statusCode->getStatusCode(200000);
         foreach ($invoices as $k => $row) {
             $this->setData['data'][$k] = [
@@ -146,6 +145,7 @@ class InvoiceController extends Controller
         }
         return response()->json($this->setData);
     }
+
 
     public function createInvoice(Request $request)
     {
@@ -172,7 +172,7 @@ class InvoiceController extends Controller
             $bookingDate = $newDate;
         }
         $this->saveInvoice($items, $invNo, $vouchers, $agents, $amounts, $bookingDate, $type);
-
+        
         DB::table('invoice_running')->increment('no', 1);
 
         return redirect('history')->with('success', 'successfully!');

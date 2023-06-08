@@ -164,6 +164,7 @@
             $('#modal-default').modal('show');
             $('#showVoucherNo').html('');
             $.ajax({
+               
                 type: 'GET',
                 url: '/api/getVoucherNo?invNo=' + id,
                 dataType: 'json',

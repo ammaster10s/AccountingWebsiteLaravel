@@ -25,6 +25,8 @@ Route::get('invoice/list', [InvoiceController::class, 'getInvoice']);
 
 Route::get('getVoucherNo', [InvoiceController::class, 'getVoucherNo']);
 
+
+
 Route::post('createInvoice', [InvoiceController::class, 'createInvoice']);
 
 // History

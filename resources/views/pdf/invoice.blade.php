@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="{{ asset('css/invoice.css') }}">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
+
+        .description {
+            margin-bottom: 20px; 
+        }
+
+        .paid-by {
+            margin-top: 20px;
+        }
+
         @font-face {
             font-family: 'THSarabunNew';
             font-style: normal;
